@@ -1,0 +1,90 @@
+---
+objects:
+  - client: Individual
+  - events: DAList.using(object_type=DAObject, there_are_any=True, complete_attribute='types', there_is_another=False)
+---
+mandatory: True
+code: |
+  # client.name.first
+  events.gather()
+  show_table
+  download
+---
+question: |
+  Client intake
+fields:
+  - First name: client.name.first
+  - Middle name: client.name.middle
+    required: False
+  - Last name: client.name.last
+  - Date of birth: client.birthdate
+    datatype: date
+  - Ethnicity: client.ethnicity
+    choices:
+      - White
+      - Hispanic or Latino
+      - Black or African American
+      - Native American or American Indian
+      - Asian or Pacific Islander
+      - Other
+  - Gender: client.gender
+    choices:
+      - Male: male
+      - Female: female
+      - Non-binary/Third gender/Other: other
+  - Charge: charge
+  - Zip code: zip
+---
+question: |
+  Add an event
+fields:
+  - Events: events[i].types
+    datatype: checkboxes
+    choices:
+      - New offer
+      - Different offer
+      - Private Investigator
+      - Social Worker
+      - New DA
+      - New Judge
+      - Police / Witness problem
+      - Discovery arriving
+      - Motion filed
+      - Charges dropped / Added
+      - Brady
+  - Date of event: events[i].date
+    datatype: date
+    default: ${format_date(today(), format='yyyy-MM-dd')}
+---
+question: |
+  Any new events?
+yesno: events.there_is_another
+---
+table: events.table
+rows: events
+columns:
+  - Event: |
+      row_item.types.true_values()
+  - Date: |
+      row_item.date  
+edit:
+  - name
+---
+event: show_table
+question: |
+  Events
+subquestion: |
+  ${events.table}
+  
+  ${events.add_action()}
+
+  [Download this information](${ events.table.export(filename='fruit.xlsx', title='fruit').url_for() })
+
+---
+event: download
+question: |
+  Download results
+subquestion: |
+  
+  
+  
